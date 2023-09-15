@@ -1,4 +1,4 @@
-# React Native Firebase Authentication and ThronesAPI Integration
+# React Native Firebase Authentication and ThronesAPI Integration - CodeScale Assessment
 
 This is a small React Native application that demonstrates Firebase authentication and integration with the ThronesAPI. It allows users to sign up, sign in, view a list of characters from the ThronesAPI, and view their profile information.
 
