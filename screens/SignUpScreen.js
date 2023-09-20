@@ -6,33 +6,75 @@ import { ArrowLeftIcon } from 'react-native-heroicons/solid';
 import { useNavigation } from '@react-navigation/native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { db } from '../config/firebase';
+import { doc, setDoc } from 'firebase/firestore';
+
 
 export default function SignUpScreen() {
   const navigation = useNavigation();
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
 
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
-  const handleSignUp = () => {
-    // Add your sign-up logic here, and make sure to validate password and confirmPassword.
+  // const handleSignUp = async () => {
+  //   // Add your sign-up logic here, and make sure to validate password and confirmPassword.
+  //   if (password !== confirmPassword) {
+  //     alert('Password and Confirm Password do not match.');
+  //     return;
+  //   }
+  //   try {
+  //     // Create the user in Firebase Authentication
+  //     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  //     const user = userCredential.user;
+  //     // Create a user document in Firestore with additional information
+  //     const userDocRef = doc(db, 'users', user.uid);
+  //     await setDoc(userDocRef, {
+  //       displayName: name, // Replace 'name' with the actual user's name
+  //       email: email,
+  //       // Add more user data fields as needed
+  //     });
+  
+  //     // Navigate to the Home screen or wherever you want
+  //     navigation.navigate('Home');
+  //   } catch (error) {
+  //     alert(error.message);
+  //   }
+    
+  // };
+
+  // const handleSubmit = async () => {
+  //   if(email && password){
+  //       try {
+  //           await createUserWithEmailAndPassword(auth, email, password);
+  //           navigation.navigate('Home')
+  //       } catch (error) {
+  //           alert(error.message)
+  //       }
+  //   }
+  // }
+
+  const handleSignUp = async () => {
     if (password !== confirmPassword) {
       alert('Password and Confirm Password do not match.');
       return;
     }
-  };
-
-  const handleSubmit = async () => {
-    if(email && password){
-        try {
-            await createUserWithEmailAndPassword(auth, email, password);
-            navigation.navigate('Home')
-        } catch (error) {
-            alert(error.message)
-        }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const userDocRef = doc(db, 'users', user.uid);
+      await setDoc(userDocRef, {
+        displayName: name,
+        email: email,
+      });
+      navigation.navigate('Home');
+    } catch (error) {
+      alert(error.message);
     }
-  }
+    
+  };
 
   return (
     <View className="flex-1 bg-white" style={{ backgroundColor: themeColors.bg }}>
@@ -53,6 +95,8 @@ export default function SignUpScreen() {
         <View className="form space-y-2">
           <Text className="text-gray-700 ml-4">Full Name</Text>
           <TextInput
+            value={name}
+            onChangeText={value=>setName(value)}
             className="p-4 bg-gray-100 text-gray-700 rounded-2xl mb-3"
             placeholder="Enter Name"
           />
@@ -68,11 +112,9 @@ export default function SignUpScreen() {
             className={`p-4 bg-gray-100 text-gray-700 rounded-2xl mb-3 ${passwordError ? 'border-red-500' : ''}`}
             secureTextEntry
             value={password}
-            onChangeText={value => {
-                // Update the password state as the user types
-                setPassword(value);
 
-                // Perform real-time password validation
+            onChangeText={value => {
+                setPassword(value);
                 const lowercaseRegex = /[a-z]/;
                 const uppercaseRegex = /[A-Z]/;
                 const digitRegex = /[0-9]/;
@@ -91,8 +133,6 @@ export default function SignUpScreen() {
                 } else if (!specialCharacterRegex.test(value)) {
                 error = 'Password must contain at least one special character.';
                 }
-
-                // Set the password error state
                 setPasswordError(error);
             }}
             placeholder="Enter Password"
@@ -112,7 +152,6 @@ export default function SignUpScreen() {
 
             onPress={() => {
                 handleSignUp();
-                handleSubmit();
             }}>
             <Text className="font-xl font-bold text-center text-gray-700">Sign Up</Text>
           </TouchableOpacity>

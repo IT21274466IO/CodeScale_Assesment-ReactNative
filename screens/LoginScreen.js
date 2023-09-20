@@ -19,7 +19,7 @@ export default function LoginScreen() {
         try {
             await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
-          setErrorMessage('Password is incorrect'); // Update error message state
+          setErrorMessage('Password is incorrect');
           console.error(error);
         }
     } else {

@@ -1,46 +1,58 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { auth } from '../config/firebase';
-import { getDatabase, ref, get } from 'firebase/database';
+import { getDoc, doc, getFirestore } from 'firebase/firestore';
 
-export default function ProfileScreen() {
-  const [userData, setUserData] = useState(null);
+export default function ProfileScreen({ navigation }) {
+  const [user, setUser] = useState(null);
+  const db = getFirestore();
 
   useEffect(() => {
-    // Get the currently authenticated user
-    const user = auth.currentUser;
-
-    if (user) {
-      // Fetch the user's profile data from the Firebase Realtime Database
-      const db = getDatabase();
-      const userRef = ref(db, `profiles/${user.uid}`);
-
-      get(userRef)
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.val();
-            setUserData(data);
+    // Fetch user data when the component mounts
+    const fetchUserData = async () => {
+      if (auth.currentUser) {
+        const userDocRef = doc(db, 'users', auth.currentUser.uid);
+        try {
+          const userDocSnapshot = await getDoc(userDocRef);
+          if (userDocSnapshot.exists()) {
+            const userData = userDocSnapshot.data();
+            setUser(userData);
+          } else {
+            console.error('User data not found in Firestore');
           }
-        })
-        .catch((error) => {
+        } catch (error) {
           console.error('Error fetching user data:', error);
-        });
-    }
+        }
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   return (
     <View style={styles.container}>
-      {userData && (
-        <>
-          <Image
-            source={{ uri: userData.profilePicture }}
-            style={styles.profileImage}
-          />
-          <Text style={styles.name}>{userData.name}</Text>
-          <Text style={styles.email}>{userData.email}</Text>
-          {/* Add more user information here */}
-        </>
-      )}
+      <View style={styles.glassEffect}>
+        <Text style={styles.title}>User Profile</Text>
+        {user ? (
+          <View>
+            <View style={styles.section}>
+              <Text style={styles.label}>Name:</Text>
+              <View style={styles.glassBackground}>
+                <Text style={styles.userDetails}>{user.displayName}</Text>
+              </View>
+            </View>
+            <View style={styles.section}>
+              <Text style={styles.label}>Email:</Text>
+              <View style={styles.glassBackground}>
+                <Text style={styles.userDetails}>{user.email}</Text>
+              </View>
+            </View>
+            
+          </View>
+        ) : (
+          <Text style={{color:'#FFFFFF'}}>Loading user data...</Text>
+        )}
+      </View>
     </View>
   );
 }
@@ -50,19 +62,37 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#180F02', 
   },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+  glassEffect: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
   },
-  name: {
+  section: {
+    marginBottom: 20,
+  },
+  title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginTop: 10,
+    marginBottom: 20,
+    color: '#FFFFFF',
+    textAlign: 'center',
   },
-  email: {
+  label: {
     fontSize: 16,
+    fontWeight: 'bold',
+    color: '#01E6FF',
+  },
+  glassBackground: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 10,
     marginTop: 5,
+    padding: 10,
+  },
+  userDetails: {
+    fontSize: 18,
+    color: 'gold',
   },
 });

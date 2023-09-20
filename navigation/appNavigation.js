@@ -9,6 +9,7 @@ import SignUpScreen from '../screens/SignUpScreen';
 import CharacterListScreen from '../screens/CharacterListScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import useAuth from '../hooks/useAuth';
+import CharacterDetailScreen from '../screens/CharacterDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,7 @@ export default function AppNavigation() {
           <Stack.Screen name="Home" options={{headerShown: false}} component={HomeScreen} />
           <Stack.Screen name="UserList" options={{headerShown: false}} component={CharacterListScreen} />
           <Stack.Screen name="Profile" options={{headerShown: false}} component={ProfileScreen} />
+          <Stack.Screen name="CharacterDetail" options={{headerShown: false}} component={CharacterDetailScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     )
@@ -35,6 +37,7 @@ export default function AppNavigation() {
           <Stack.Screen name="SignUp" options={{headerShown: false}} component={SignUpScreen} />
           <Stack.Screen name="UserList" options={{headerShown: false}} component={CharacterListScreen} />
           <Stack.Screen name="Profile" options={{headerShown: false}} component={ProfileScreen} />
+          <Stack.Screen name="CharacterDetail" options={{headerShown: false}} component={CharacterDetailScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     )

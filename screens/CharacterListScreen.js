@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
-import { FontAwesome5 } from '@expo/vector-icons'; // You can import icons from a library like FontAwesome5
+import CharacterDetailScreen from './CharacterDetailsScreen';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const CharacterListScreen = () => {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     // Fetch data from the ThronesAPI
@@ -21,6 +25,10 @@ const CharacterListScreen = () => {
       });
   }, []);
 
+  const handleCharacterPress = (character) => {
+    navigation.navigate('CharacterDetail', { character });
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -30,17 +38,19 @@ const CharacterListScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} >
       <Text style={styles.title}>Game of Thrones Characters</Text>
       <FlatList
         data={characters}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.characterItem}>
-            <Text style={styles.characterName}>{item.fullName}</Text>
-            <Text style={styles.characterTitle}>{item.title}</Text>
-            <FontAwesome5 name="dragon" style={styles.icon} />
-          </View>
+          <TouchableOpacity onPress={() => handleCharacterPress(item)}>
+            <View style={styles.characterItem}>
+              <Text style={styles.characterName}>{item.fullName}</Text>
+              <Text style={styles.characterTitle}>{item.title}</Text>
+              <FontAwesome5 name="dragon" style={styles.icon} />
+            </View>
+          </TouchableOpacity>
         )}
       />
     </View>
@@ -51,7 +61,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#0F0902',
+    backgroundColor: '#180F02',
   },
   loadingContainer: {
     flex: 1,
@@ -63,7 +73,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 30,
     color: '#fff',
-    textAlign: 'center', // Center the text
+    textAlign: 'center', 
   },
   characterItem: {
     marginBottom: 16,
@@ -71,19 +81,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E1E1E',
     padding: 16,
     borderRadius: 8,
-    flexDirection: 'row', // Display text and icon in a row
-    alignItems: 'center', // Center items vertically
+    flexDirection: 'row', 
+    alignItems: 'center',
   },
   characterName: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    flex: 1, // Expand to fill available space
+    flex: 1, 
   },
   characterTitle: {
     fontSize: 16,
     color: '#01E6FF',
-    flex: 1, // Expand to fill available space
+    flex: 1, 
   },
   icon: {
     fontSize: 24,
